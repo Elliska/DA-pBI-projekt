@@ -1,21 +1,47 @@
+import pyodbc
+from sqlalchemy import create_engine
 import pandas as pd
 from datetime import datetime, timedelta
 import holidays
-import os
 
 
-script_dir = os.path.dirname(os.path.realpath(__file__))
+dim_date = 'dimDate'
 
-# Nastavení názvu souboru
-file_name = "date_export.csv"
+################ DB connection
+server = 'localhost'
+database = 'weather'
+trusted_connection = 'yes'
+conn = pyodbc.connect(f'DRIVER={{SQL Server}};SERVER={server};DATABASE={database};TRUSTED_CONNECTION={trusted_connection}')
+cursor = conn.cursor()
 
-# Vytvoření cesty k souboru ve stejném adresáři jako skript
-file_path = os.path.join(script_dir, file_name)
+print('Spojení s DB navázáno.')
 
+create_table_script = f'''
+    IF OBJECT_ID('{dim_date}', 'U') IS NULL
+    BEGIN
+        CREATE TABLE {dim_date} (
+        ID_date INT PRIMARY KEY,
+        date_name DATE,
+        date_of_week NVARCHAR(20),
+        quarter INT,
+        holiday NVARCHAR(1),
+        holiday_name NVARCHAR(50),
+        season NVARCHAR(20),
+        week_num INT,
+        year INT,
+        month INT,
+        day INT
+    );
+    END
+'''
+cursor.execute(create_table_script)
+conn.commit()
+
+print(f'Tabulka {dim_date} byla vytvořena.')
 
 # Generování kalendářních dat
 start_date = datetime(2000, 1, 1)
-end_date = datetime(2025, 12, 31)
+end_date = datetime(2035, 12, 31)
 current_date = start_date
 
 cz_holidays = holidays.Czechia()
@@ -37,9 +63,9 @@ while current_date <= end_date:
         'season': 'Zima' if current_date.month in [12, 1, 2] else 'Jaro' if current_date.month in [3, 4, 5] else
                   'Léto' if current_date.month in [6, 7, 8] else 'Podzim' if current_date.month in [9, 10, 11] else None,
         'week_num': current_date.isocalendar()[1],
-        'year': int(current_date.strftime('%Y')),
-        'month': int(current_date.strftime('%m')),
-        'day': int(current_date.strftime('%d')),
+        'year':int(current_date.strftime('%Y')),
+        'month':int(current_date.strftime('%m')),
+        'day':int(current_date.strftime('%d')),
     })
 
     current_date += timedelta(days=1)
@@ -47,11 +73,24 @@ while current_date <= end_date:
 print('Data vygenerována. Vytvářím DataFrame...')
 
 # Vytvoření DataFrame
+engine = create_engine(f'mssql+pyodbc://{server}/{database}?driver=SQL+Server+Native+Client+11.0')
 df = pd.DataFrame(data)
 
-print('DataFrame vytvořen. Vkládám data do CSV souboru...')
+print('DataFrame vytvořen. Vkládám data do SQL Serveru...')
 
-# Export do CSV souboru
-df.to_csv(file_path, index=False)
+chunksize = 100
+for i in range(0, len(df), chunksize):
+    df_chunk = df.iloc[i:i + chunksize]
+    df_chunk.to_sql(dim_date, engine, index=False, if_exists='append')
 
-print(f'Data byla exportována do CSV souboru: {file_path}.')
+    progress_percentage = (i + len(df_chunk)) / len(df) * 100
+    print(f'Postup: {progress_percentage:.2f}%')
+
+# Vložení dat do SQL Serveru
+df.to_sql(dim_date, engine, index=False, if_exists='replace')
+
+print('Databyla vložena do DB')
+# Uzavření připojení
+conn.close()
+
+print(f'Skript pro {dim_date} byl dokončen.')
