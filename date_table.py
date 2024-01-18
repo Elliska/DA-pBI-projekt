@@ -1,17 +1,15 @@
 import pyodbc
-from sqlalchemy import create_engine
 import pandas as pd
 from datetime import datetime, timedelta
 import holidays
-
 
 dim_date = 'dimDate'
 
 ################ DB connection
 server = 'localhost'
 database = 'weather'
-trusted_connection = 'yes'
-conn = pyodbc.connect(f'DRIVER={{SQL Server}};SERVER={server};DATABASE={database};TRUSTED_CONNECTION={trusted_connection}')
+trusted_connection = 'yes' 
+conn = pyodbc.connect('DRIVER={SQL Server};SERVER='+server+';DATABASE='+database+';TRUSTED_CONNECTION='+trusted_connection)
 cursor = conn.cursor()
 
 print('Spojení s DB navázáno.')
@@ -63,33 +61,26 @@ while current_date <= end_date:
         'season': 'Zima' if current_date.month in [12, 1, 2] else 'Jaro' if current_date.month in [3, 4, 5] else
                   'Léto' if current_date.month in [6, 7, 8] else 'Podzim' if current_date.month in [9, 10, 11] else None,
         'week_num': current_date.isocalendar()[1],
-        'year':int(current_date.strftime('%Y')),
-        'month':int(current_date.strftime('%m')),
-        'day':int(current_date.strftime('%d')),
+        'year': int(current_date.strftime('%Y')),
+        'month': int(current_date.strftime('%m')),
+        'day': int(current_date.strftime('%d')),
     })
 
     current_date += timedelta(days=1)
 
-print('Data vygenerována. Vytvářím DataFrame...')
+print('Data vygenerována. Vkládám data do SQL Serveru...')
 
-# Vytvoření DataFrame
-engine = create_engine(f'mssql+pyodbc://{server}/{database}?driver=SQL+Server+Native+Client+11.0')
-df = pd.DataFrame(data)
+# Insert data into the SQL Server table
+insert_query = f'''
+    INSERT INTO {dim_date} (
+        ID_date, date_name, date_of_week, quarter, holiday, holiday_name, season, week_num, year, month, day
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+'''
+for row in data:
+    cursor.execute(insert_query, tuple(row.values()))
+conn.commit()
 
-print('DataFrame vytvořen. Vkládám data do SQL Serveru...')
-
-chunksize = 100
-for i in range(0, len(df), chunksize):
-    df_chunk = df.iloc[i:i + chunksize]
-    df_chunk.to_sql(dim_date, engine, index=False, if_exists='append')
-
-    progress_percentage = (i + len(df_chunk)) / len(df) * 100
-    print(f'Postup: {progress_percentage:.2f}%')
-
-# Vložení dat do SQL Serveru
-df.to_sql(dim_date, engine, index=False, if_exists='replace')
-
-print('Databyla vložena do DB')
+print('Data byla vložena do DB')
 # Uzavření připojení
 conn.close()
 

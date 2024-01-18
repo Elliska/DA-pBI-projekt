@@ -4,7 +4,7 @@ import pyodbc
 from unidecode import unidecode 
 #################
 # Relativní cesta jako obvykle odmítá fungovat
-in_path = 'C:/Users/michaela.maleckova/OneDrive - Seyfor/Projekt/DA-pBI-projekt/source_data/B2BTUR01.xlsx'
+in_path = 'C:/Users/malec/OneDrive/Analýzy/Datová akademie - pBI projekt/source_data/B2BTUR01.xlsx'
 out_path = 'C:/Users/michaela.maleckova/OneDrive - Seyfor/Projekt/DA-pBI-projekt/export.xlsx'
 out_path_info = 'C:/Users/michaela.maleckova/OneDrive - Seyfor/Projekt/DA-pBI-projekt/dimStanice.xlsx'
 
