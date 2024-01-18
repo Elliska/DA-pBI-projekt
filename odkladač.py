@@ -59,6 +59,7 @@ print(non_empty_rows)
 ############################
 
 import pandas as pd
+from functools import reduce 
 
 in_path = 'C:/Users/michaela.maleckova/OneDrive - Seyfor/Projekt/DA-pBI-projekt/source_data/B2BTUR01_2.xlsx'
 out_path = 'C:/Users/michaela.maleckova/OneDrive - Seyfor/Projekt/DA-pBI-projekt/export.xlsx'
@@ -82,7 +83,7 @@ for sheet_name, sheet_data in all_sheets.items():
     value_A1 = up.iloc[0, 0]
 
     # Handle the case where 'stanice' information might be a float
-    value_A2 = str(up.iloc[1, 0]).lstrip('stanice: ')
+    
 
     # Ensure that 'rok' and 'měsíc' columns are present in the DataFrame
     if 'rok' not in df.columns or 'měsíc' not in df.columns:
@@ -95,13 +96,27 @@ for sheet_name, sheet_data in all_sheets.items():
     le['den'] = le['den'].str.rstrip('.')
     le['den'] = le['den'].apply(lambda x: str(x).zfill(2))  # Přidání nuly před jednociferné dny
     le['datum'] = le['rok'].astype(str) + '-' + le['měsíc'].astype(str).str.zfill(2) + '-' + le['den']
-    le['stanice'] = value_A2
+    
 
-    df_result = le[['datum', value_A1, 'stanice']]  # Přesunutí 'stanice' na konec pro pořadí ve výsledném DataFrame
+    df_result = le[['datum', value_A1]]  # Přesunutí 'stanice' na konec pro pořadí ve výsledném DataFrame
     dfs.append(df_result)
 
-# Výpis výsledných DataFrames a uložení do Excelu
-print(dfs)
-with pd.ExcelWriter(out_path) as writer:
-    for i, df in enumerate(dfs):
-        df.to_excel(writer, sheet_name=f'Processed_{i+1}', index=False)
+up = pd.read_excel(in_path, sheet_name=1, header=None)
+df = pd.read_excel(in_path, sheet_name=1, header=3)
+
+le['den'] = le['den'].str.rstrip('.')
+le['den'] = le['den'].apply(lambda x: str(x).zfill(2))  # Přidání nuly před jednociferné dny
+le['datum'] = le['rok'].astype(str) + '-' + le['měsíc'].astype(str).str.zfill(2) + '-' + le['den']
+
+value_A2 = str(up.iloc[1, 0]).lstrip('stanice: ')
+le['stanice'] = value_A2
+df_result = le[['datum','stanice']] 
+
+
+merged_df = reduce(lambda left, right: pd.merge(left, right, on='datum'), dfs)
+final = pd.merge(merged_df,df_result, on='datum')
+
+print(final)
+
+final.to_excel(out_path, index=False)
+
