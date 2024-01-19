@@ -16,6 +16,8 @@ V okamžiku rozhodnutí, že potřebuji udělat datovou tabulku, jsem začala zv
 
 Dodatečně přidány a zpracovány všechny dostupné tabulky z čelé ČR za všechny dostupné roky. Některé tabulky mají v datech mezery a tedy nesedí celkový počet záznamů. Jelikož ani skripty neměly být součástí práce, není v mých silách opravovat všechny join (merge) ve skriptech tak, aby dat chybělo co nejméně. Řešením by bylo takové stanice z databáze odstranit, aby chybějící data nedělala nepořádek. Skript odstraní všechny prázdné řádky, protože originální tabulky mají pro každý měsíc 31 sloupců. Řešením by bylo buď join (merge) poskládat jinou logikou, nebo v jiné fázi skriptu odstranit prázdné řádky. Např. na sloupci s průměrnou teplotou, kde chybění dat je relativně nepravděpodobné.
 
+V tabulce o stanicích bylo potřeba řešit nestandardní datum "dosud". Tedy, že stanice nemá ukončené měření. Zvažovala jsem dát nějaké absurdní datum jako 31.12.9999, aby bylo jasné, že k ukončení nedošlo. Jelikož však navazující dimenzionální tabulka toto datum nemá a je pouze do roku 2035, docházelo by ke zbytečným problémům a chybějícím datům. Proto u všech stanic, které jsou aktivní mají datum ukončení až 31.12.2035. Toto datum je ve skriptu napsáno jako nahrazovaná hodnota.
+
 ### Popis souborů
 * transformace_dat2.py
      * Projde všechny *.xlsx soubory ve složce a každý soubor zpracuje. Následně vše naláduje do databáze.
@@ -35,4 +37,11 @@ Dodatečně přidány a zpracovány všechny dostupné tabulky z čelé ČR za v
 
 Nebyla navržena žádná specifická struktura, vzhledem k jednoduchosti databáze. Dalo by se však říct, že databáze ctí star schéma, byť velmi zjednodušené.
 Hlavní faktová factData má v sobě všechna data (datum, všechna měření a kód stanice). Klíčem je kód stanice.
-Tabulka dimStation tvoří dimenzi k faktové tabulce. Jsou v ní obsažené údaje o meteorologické stanici, její lokalitě atd.
+Tabulka dimStation tvoří dimenzi k faktové tabulce. Jsou v ní obsažené údaje o meteorologické stanici, její lokalitě atd. Momentálně je napojení many to many a bylo by tedy vhodné vztah upravit, popřípadě vytvořit mezitabulku. Toto však není vůbec cílem tohoto projektu a je tedy nutné se spokojit s Power Query edit, popř. SQL WHERE napojením.
+
+### Používané programy a technologie
+* chatGPT
+    * velká pomoc s debug kódu
+* Visual Studio Code
+* Power BI desktop
+* GitHub Desktop
