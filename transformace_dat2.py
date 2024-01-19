@@ -2,10 +2,13 @@ import pandas as pd
 from functools import reduce 
 import pyodbc
 from unidecode import unidecode 
+import os 
 #################
-in_path = 'C:/Users/michaela.maleckova/OneDrive - Seyfor/Projekt/DA-pBI-projekt/source_data/B2BTUR01.xlsx'
-out_path = 'C:/Users/michaela.maleckova/OneDrive - Seyfor/Projekt/DA-pBI-projekt/export.xlsx'
-out_path_info = 'C:/Users/michaela.maleckova/OneDrive - Seyfor/Projekt/DA-pBI-projekt/dimStanice.xlsx'
+
+os.chdir('C:/Users/michaela.maleckova/OneDrive - Seyfor/Projekt/DA-pBI-projekt') #problém s relativní cestou přesunut pouze jinam *facepalm*
+print(f'working directory: {os.getcwd()}')
+
+in_path = './source_data/B2BTUR01.xlsx'
 
 # Načtení dat ze všech listů
 all_sheets = pd.read_excel(in_path, sheet_name=None, header=None)
@@ -132,7 +135,7 @@ print('Tabulky vytvořeny')
 columns_data = ('datum', 'teplota_prumerna', 'teplota_maximalni', 'teplota_minimalni', 'rychlost_vetru', 'tlak_vzduchu', 'vlhkost_vzduchu', 'uhrn_srazek', 'celkova_vyska_snehu', 'slunecni_svit', 'stanice')
 columns_info = ('indikativ_stanice', 'WMO_indikativ', 'nazev_stanice', 'zacatek_pozorovani', 'konec_pozorovani', 'zemepisna_sirka', 'zemepisna_delka', 'nadmorska_vyska', 'povodi', 'typ_stanice')
 
-
+# Spojení dohromady do jednoho cyklu klasika, nechce spolupracovat.
 for index, row in final.iterrows():
     values_dict = row.to_dict()
     insert_query = f"INSERT INTO {table_data} ({', '.join(columns_data)}) VALUES ({', '.join(['?']*len(columns_data))});"

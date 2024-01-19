@@ -2,11 +2,15 @@ import pandas as pd
 from functools import reduce 
 import pyodbc
 from unidecode import unidecode 
+import os 
 #################
-# Relativní cesta jako obvykle odmítá fungovat
-in_path = 'C:/Users/malec/OneDrive/Analýzy/Datová akademie - pBI projekt/source_data/B2BTUR01.xlsx'
-out_path = 'C:/Users/michaela.maleckova/OneDrive - Seyfor/Projekt/DA-pBI-projekt/export.xlsx'
-out_path_info = 'C:/Users/michaela.maleckova/OneDrive - Seyfor/Projekt/DA-pBI-projekt/dimStanice.xlsx'
+
+os.chdir('C:/Users/michaela.maleckova/OneDrive - Seyfor/Projekt/DA-pBI-projekt') #problém s relativní cestou přesunut pouze jinam *facepalm*
+print(f'working directory: {os.getcwd()}')
+
+in_path = './source_data/B2BTUR01.xlsx'
+#out_path = 'C:/Users/michaela.maleckova/OneDrive - Seyfor/Projekt/DA-pBI-projekt/export.xlsx'
+#out_path_info = 'C:/Users/michaela.maleckova/OneDrive - Seyfor/Projekt/DA-pBI-projekt/dimStanice.xlsx'
 
 # Načtení dat ze všech listů
 all_sheets = pd.read_excel(in_path, sheet_name=None, header=None)
