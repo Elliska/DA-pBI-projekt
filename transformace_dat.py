@@ -5,12 +5,17 @@ from unidecode import unidecode
 import os 
 #################
 
+
+# PRO JEDEN SOUBOR
 os.chdir('C:/Users/michaela.maleckova/OneDrive - Seyfor/Projekt/DA-pBI-projekt') #problém s relativní cestou přesunut pouze jinam *facepalm*
 print(f'working directory: {os.getcwd()}')
 
-in_path = './source_data/B2BTUR01.xlsx'
-#out_path = 'C:/Users/michaela.maleckova/OneDrive - Seyfor/Projekt/DA-pBI-projekt/export.xlsx'
-#out_path_info = 'C:/Users/michaela.maleckova/OneDrive - Seyfor/Projekt/DA-pBI-projekt/dimStanice.xlsx'
+# Pro opravy dat (False, data nemazat, ale přidat)
+should_drop_table_data = False
+should_drop_table_station = False
+in_path = './source_data/U2LIBC01.xlsx'
+
+
 
 # Načtení dat ze všech listů
 all_sheets = pd.read_excel(in_path, sheet_name=None, header=None)
@@ -88,13 +93,13 @@ table_data = 'factData'
 table_station = 'dimStation'
 
 
-should_update_table = True
 
-if should_update_table:
+
+if should_drop_table_data:
     drop_table_script = f'DROP TABLE IF EXISTS {table_data};'
     cursor.execute(drop_table_script)
 
-if should_update_table:
+if should_drop_table_station:
     drop_table_script = f'DROP TABLE IF EXISTS {table_station};'
     cursor.execute(drop_table_script)
 
