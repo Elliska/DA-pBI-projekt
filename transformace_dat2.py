@@ -7,7 +7,9 @@ import os
 # PRO VŠECHNY SOUBORY VE SLOŽCE
 
 # Nastavení pracovního adresáře
-os.chdir('C:/Users/michaela.maleckova/OneDrive - Seyfor/Projekt/DA-pBI-projekt')
+
+os.chdir('C:/Users/malec/OneDrive/Analýzy/Datová akademie - pBI projekt')
+#os.chdir('C:/Users/michaela.maleckova/OneDrive - Seyfor/Projekt/DA-pBI-projekt')
 
 # Adresář, ve kterém jsou uloženy Excel soubory
 data_folder = './source_data/'

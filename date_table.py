@@ -38,7 +38,7 @@ conn.commit()
 print(f'Tabulka {dim_date} byla vytvořena.')
 
 # Generování kalendářních dat
-start_date = datetime(2000, 1, 1)
+start_date = datetime(1961, 1, 1)
 end_date = datetime(2035, 12, 31)
 current_date = start_date
 

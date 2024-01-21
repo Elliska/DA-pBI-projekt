@@ -1,12 +1,27 @@
-# Tady bude povídání o grafech
+# O co jde?
+Jedná se o úkol pro datovou akademii Engeto.
 
-# Datová akademie Power Bi projekt
-* tady asi bude zadání
+## Zadání
+Finální PBI musí splňovat tato kritéria:
+* Rozsah 2-3 stránky
+* Použití minimálně 5 různých typů vizuálů
+* Filtrování pomocí slicerů
+* Využití bookmarks/page navigation
+
+* Propojení více datových zdrojů, ať už v Power Query, nebo v Power BI
+    * hlavní připojení je do localhost databáze
+    * druhé datové připojení pak splňuje zcela zbytečně připojená tabulka s výškou sněhu pro Brno. S pomocí M jazyka je zde i transformace dat.
+* Použití datové hierarchie o alespoň dvou úrovních
+    * do dat je přidaná hierarchie, která zde nedává žádný velký smysl, ale jedná sev o jediná data, která bylo možné alespoň trochu smysluplně hierarchizovat (teplota)
+* Vytvoření alespoň 1 measure (metrika/míra) a 1 kalkulovaného sloupce
+    * v PowerQuery u nadbytečně přidané tabulky je podmíněný i kalkulovaný sloupec
+* Grafická úprava použitých vizuálů a vizuálně přívětivý výsledný report
+
 
 ## Můj cíl
-Jelikož mne Power Bi až tolik nenadchl, cílem nebylo dělat jakékoliv objevné analýzy ani grafy, spíše naprosto jednoduchá konstatování faktů se splněním zadání. Úkol začal být mnohem zajímavější v okamžiku, kdy jsem zjistila, že stažená data potřebují transformovat, aby se mi s nimi dobře pracovalo.
+Jelikož mne Power Bi až tolik nenadchl, cílem nebylo dělat jakékoliv objevné analýzy ani grafy, spíše naprosto jednoduchá konstatování faktů. Úkol začal být mnohem zajímavější v okamžiku, kdy jsem zjistila, že stažená data potřebují transformovat, aby se mi s nimi dobře pracovalo.
 
-# Co nebylo úkolem
+## Co nebylo úkolem
 Transformace dat, databáze a python.
 
 ## Datová tabulka
@@ -17,6 +32,8 @@ V okamžiku rozhodnutí, že potřebuji udělat datovou tabulku, jsem začala zv
 Dodatečně přidány a zpracovány všechny dostupné tabulky z čelé ČR za všechny dostupné roky. Některé tabulky mají v datech mezery a tedy nesedí celkový počet záznamů. Jelikož ani skripty neměly být součástí práce, není v mých silách opravovat všechny join (merge) ve skriptech tak, aby dat chybělo co nejméně. Řešením by bylo takové stanice z databáze odstranit, aby chybějící data nedělala nepořádek. Skript odstraní všechny prázdné řádky, protože originální tabulky mají pro každý měsíc 31 sloupců. Řešením by bylo buď join (merge) poskládat jinou logikou, nebo v jiné fázi skriptu odstranit prázdné řádky. Např. na sloupci s průměrnou teplotou, kde chybění dat je relativně nepravděpodobné.
 
 V tabulce o stanicích bylo potřeba řešit nestandardní datum "dosud". Tedy, že stanice nemá ukončené měření. Zvažovala jsem dát nějaké absurdní datum jako 31.12.9999, aby bylo jasné, že k ukončení nedošlo. Jelikož však navazující dimenzionální tabulka toto datum nemá a je pouze do roku 2035, docházelo by ke zbytečným problémům a chybějícím datům. Proto u všech stanic, které jsou aktivní mají datum ukončení až 31.12.2035. Toto datum je ve skriptu napsáno jako nahrazovaná hodnota.
+
+Jelikož integrita dat nebyla cílem této práce, neproběhla v této oblasti korekce ani kontrola žádným způsobem.
 
 ### Popis souborů
 * transformace_dat2.py
@@ -45,3 +62,5 @@ Tabulka dimStation tvoří dimenzi k faktové tabulce. Jsou v ní obsažené úd
 * Visual Studio Code
 * Power BI desktop
 * GitHub Desktop
+* MS SQL server
+* DBeaver

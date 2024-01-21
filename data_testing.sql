@@ -2,6 +2,8 @@ SELECT * FROM factData fd ;
 SELECT * FROM dimStation ;
 SELECT * FROM dimDate ;
 
+DROP TABLE dimDate;
+
 
 SELECT 
 	stanice,
